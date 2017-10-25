@@ -2,16 +2,23 @@ package starter.ebean;
 
 import org.jooby.Jooby;
 import org.jooby.ebean.Ebeanby;
+import org.jooby.jdbc.Jdbc;
 import org.jooby.json.Jackson;
 
 import io.ebean.EbeanServer;
 import io.ebean.config.ServerConfig;
 import starter.ebean.query.QPet;
 
+/**
+ * Starter project for Ebean ORM.
+ */
 public class App extends Jooby {
 
   {
     use(new Jackson());
+
+    /** Jdbc: */
+    use(new Jdbc());
 
     /**
      * Configure Ebean:

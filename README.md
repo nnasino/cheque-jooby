@@ -7,7 +7,7 @@ Starter project for [Ebean ORM](http://ebean-orm.github.io/).
 
 This project contains a simple application that:
 
-* Use a memory database
+* Uses a memory database
 * Insert some database records on application startup time
 * Expose data via `JSON` routes.
 * [Query beans](http://ebean-orm.github.io/docs/query/typesafe)
