@@ -57,6 +57,7 @@ public class User extends AbstractEntity {
     @Override
     public String toString() {
         return "User{" +
+                "id=\'"+getId()+"\'"+
                 "username='" + username + '\'' +
                 ", passwordHash='" + passwordHash + '\'' +
                 ", branch=" + branch +

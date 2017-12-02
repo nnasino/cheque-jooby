@@ -73,7 +73,7 @@ itShouldCreateNewUser();
   @Test
   public void itShouldNotCreateInvalidUser() throws JsonProcessingException {
       String response = postAddUser(invalidUser);
-      assertTrue("Success should be false because of invalid input", response.contains("\"success\": false"));
+      assertTrue("Success should be false because of invalid input", response.contains("An Error Occurred"));
   }
 
     private String postAddUser(User user) throws JsonProcessingException {
