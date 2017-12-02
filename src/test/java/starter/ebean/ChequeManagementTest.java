@@ -1,19 +1,20 @@
 package starter.ebean;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.restassured.response.Response;
 import org.jooby.test.JoobyRule;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.Parameterized;
-import starter.ebean.App;
 import starter.ebean.models.Cheque;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.restassured.RestAssured.get;
-import static org.hamcrest.Matchers.equalTo;
+import static io.restassured.RestAssured.given;
+import static org.junit.Assert.assertTrue;
+
 
 public class ChequeManagementTest {
     /**
@@ -24,10 +25,18 @@ public class ChequeManagementTest {
     public static JoobyRule app = new JoobyRule(new App());
 
     @Parameterized.Parameter
-    public Cheque cheque;
+    public Cheque invalidCheque;
 
-    private Cheque mockInvalidCheque() {
+    public Cheque validCheque;
 
+
+
+    @Before
+    public void setUp(){
+        validCheque = new Cheque();
+        validCheque.setStartNumber(1);
+        validCheque.setStartNumber(50);
+        validCheque.setBankName("UBA");
     }
 
     @Parameterized.Parameters
@@ -57,21 +66,43 @@ public class ChequeManagementTest {
 
 
     @Test
-    public void itShouldCreateAndAssignCheque() {
-
+    public void itShouldCreateAndAssignCheque() throws JsonProcessingException {
+        String response = postAddCheque(validCheque);
+        assertTrue("Success should be true and id should be return", response.contains("\"id\"") && response.contains("\"success\": true"));
     }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void itShouldNotCreateChequeWithInvalidStartOrEnd() {
-
-    }
-
 
     @Test
-    public void itShouldNotCreateChequeWithUsedLeaves() {
-
+    public void itShouldNotCreateChequeWithInvalidStartOrEnd() throws JsonProcessingException {
+        String response = postAddCheque(invalidCheque);
+        assertTrue("Success should be false because of invalid input", response.contains("\"success\": false"));
     }
-//            2) Cheque management: Create and assign new cheques.
-// To create a cheque you need to accept the bank name, start and end number of the cheque since cheques are serial.
-// You are to assign cheques to users who have the branch manager role.
+
+    @Test
+    public void itShouldNotCreateChequeWithUsedLeaves() throws JsonProcessingException {
+        itShouldCreateAndAssignCheque();
+        String response = postAddCheque(validCheque);
+        Assert.assertTrue("Success should be false and message should say cheque leaves already in use",
+               response.contains("Cheque Leaves in use") && response.contains("\"success\":false"));
+    }
+
+    private String postAddCheque(Cheque cheque) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        //Object to JSON in String
+        String json = mapper.writeValueAsString(cheque);
+
+        Response r = given()
+                .contentType("application/json").
+                        body(json).
+                        when().
+                        post("/cheque");
+
+        String body = r.getBody().asString();
+        System.out.println(body);
+
+        return body;
+    }
+    //            2) Cheque management: Create and assign new cheques.
+    // To create a cheque you need to accept the bank name, start and end number of the cheque since cheques are serial.
+    // You are to assign cheques to users who have the branch manager role.
 }
