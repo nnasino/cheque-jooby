@@ -1,74 +1,107 @@
 package starter.ebean;
 
+import com.google.inject.Inject;
+import io.ebean.EbeanServer;
+import io.ebean.config.ServerConfig;
 import org.jooby.Jooby;
 import org.jooby.ebean.Ebeanby;
 import org.jooby.jdbc.Jdbc;
 import org.jooby.json.Jackson;
-
-import io.ebean.EbeanServer;
-import io.ebean.config.ServerConfig;
-import starter.ebean.query.QPet;
+import org.slf4j.Logger;
+import starter.ebean.dtos.ResponseMessage;
+import starter.ebean.models.Branch;
+import starter.ebean.models.User;
+import starter.ebean.models.query.QBranch;
+import starter.ebean.models.query.QUser;
+import starter.ebean.services.ChequeService;
+import starter.ebean.services.UserService;
 
 /**
  * Starter project for Ebean ORM.
  */
 public class App extends Jooby {
 
-  {
-    use(new Jackson());
+    @Inject
+    private ChequeService chequeService;
 
-    /** Jdbc: */
-    use(new Jdbc());
+    @Inject
+    private UserService userService;
+    {
+        use(new Jackson());
 
-    /**
-     * Configure Ebean:
-     */
-    use(new Ebeanby().doWith((final ServerConfig ebean) -> {
-      /** These can be done in .conf file too: */
-      ebean.setDisableClasspathSearch(false);
-      ebean.setDdlGenerate(true);
-      ebean.setDdlRun(true);
-    }));
+        /** Jdbc: */
+        use(new Jdbc());
 
-    /**
-     * Insert some data on startup:
-     */
-    onStart(() -> {
-      EbeanServer ebean = require(EbeanServer.class);
-      ebean.insert(new Pet("Lala"));
-      ebean.insert(new Pet("Mandy"));
-      ebean.insert(new Pet("Fufy"));
-    });
+        use(new AppModule());
+        /**
+         * Configure Ebean:
+         */
+        use(new Ebeanby().doWith((final ServerConfig ebean) -> {
+            /** These can be done in .conf file too: */
+            ebean.setDisableClasspathSearch(false);
+            ebean.setDdlGenerate(true);
+            ebean.setDdlRun(true);
+        }));
 
-    /**
-     * Find all via query-beans:
-     */
-    get("/pets", req -> {
-      return new QPet().findList();
-    });
+        /**
+         * Insert some data on startup:
+         */
+        onStart(() -> {
+            EbeanServer ebean = require(EbeanServer.class);
+       });
 
-    /**
-     * Find by id via ebean:
-     */
-    get("/pets/{id:\\d+}", req -> {
-      int id = req.param("id").intValue();
-      EbeanServer ebean = require(EbeanServer.class);
-      return ebean.find(Pet.class, id);
-    });
+        //User API
+        /** Add a new user to the system
+         *
+         */
+        post("/users", req -> {
+            User user = null;
+            Long id = null;
+            try {
+                user = req.body().to(User.class);
+                user.setId(userService.addUser(user));
+            } catch (Exception exc) {
+                exc.printStackTrace();
+                return "{ \"message\": \"An Error Occurred: Invalid Inputs supplied\"}";
+            }
+            System.out.println(user.toString());
+            return user;
+        });
 
-    /**
-     * Find by name via query-beans:
-     */
-    get("/pets/:name", req -> {
-      EbeanServer ebean = require(EbeanServer.class);
-      String name = req.param("name").value();
-      return new QPet(ebean).name.ilike(name)
-          .findList();
-    });
-  }
+        /**
+         * Find user by id
+         */
+        get("/users/{id:\\d+}", req -> {
+            Long id = req.param("id").longValue();
+            return userService.findUserById(id);
+        });
 
-  public static void main(final String[] args) {
-    run(App::new, args);
-  }
+
+        /**
+         * Find all users
+         */
+        get("/users", req -> {
+            //check for page and sort parameters
+
+            //return page
+
+            //return sort
+
+            //return all
+            return userService.findAll();
+        });
+
+
+
+        //Cheque API
+        /** Add a new cheque to the system and assign it to a user
+         *
+         */
+
+    }
+
+    public static void main(final String[] args) {
+        run(App::new, args);
+    }
 
 }

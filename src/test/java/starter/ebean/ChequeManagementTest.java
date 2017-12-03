@@ -29,8 +29,6 @@ public class ChequeManagementTest {
 
     public Cheque validCheque;
 
-
-
     @Before
     public void setUp(){
         validCheque = new Cheque();
