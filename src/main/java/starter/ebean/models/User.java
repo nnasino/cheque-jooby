@@ -6,9 +6,11 @@ import java.util.List;
 @Entity
 public class User extends AbstractEntity {
 
+    @Column(unique = true)
     private String username;
     private String passwordHash;
-    private String branch;
+    @ManyToOne
+    private Branch branch;
     private Role role;
     @OneToMany(mappedBy = "user")
     private List<Cheque> cheques;
@@ -37,12 +39,11 @@ public class User extends AbstractEntity {
         this.role = role;
     }
 
-    public String getBranch() {
-
+    public Branch getBranch() {
         return branch;
     }
 
-    public void setBranch(String branch) {
+    public void setBranch(Branch branch) {
         this.branch = branch;
     }
 

@@ -1,5 +1,6 @@
 package starter.ebean.services;
 
+import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.User;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public interface UserService {
      * @param user the User object to be saved
      * @return the db id of the saved User
      */
-    Long addUser(User user);
+    Long addUser(UserDTO user);
 
     /**
      * Finds the {@link starter.ebean.models.User} record with the specified db id
@@ -30,6 +31,5 @@ public interface UserService {
      *
      * @return List of Cheques
      */
-
-    List<User> findAll();
+    List<User> findPage(int page, int pageSize);
 }

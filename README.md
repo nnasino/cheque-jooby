@@ -5,6 +5,21 @@ Starter project for [Ebean ORM](http://ebean-orm.github.io/).
 
 ## quick preview
 
+Branch codes:
+
+Head Office - 0001
+Ojuelegba Road - 0002
+John Road - 0003
+Marina - 0004
+Ajose Adeogun - 0005
+
+Role Types:
+
+ADMIN
+BRANCH_MANAGER
+LOAN_OFFICER
+
+
 This project contains a simple application that:
 
 * Uses a memory database
