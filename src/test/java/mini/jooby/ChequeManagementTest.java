@@ -3,6 +3,7 @@ package mini.jooby;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.response.Response;
+import mini.jooby.dtos.UserDTO;
 import mini.jooby.models.Cheque;
 import org.jooby.test.JoobyRule;
 import org.junit.*;
@@ -29,6 +30,10 @@ public class ChequeManagementTest {
 
     public Cheque validCheque;
 
+    private UserDTO adminUser;
+    private UserDTO loanOfficer;
+    private UserDTO branchManager;
+
 
     @Before
     public void setUp(){
@@ -36,6 +41,19 @@ public class ChequeManagementTest {
         validCheque.setStartNumber(1);
         validCheque.setStartNumber(50);
         validCheque.setBankName("UBA");
+
+        adminUser = new UserDTO();
+        loanOfficer = new UserDTO();
+        branchManager = new UserDTO();
+
+        adminUser.setPassword("password123");
+        adminUser.setUsername("administrator");
+
+        loanOfficer.setPassword("password123");
+        loanOfficer.setUsername("john.bola");
+
+        branchManager.setPassword("password123");
+        branchManager.setUsername("daniel.wale");
     }
 
     @Parameterized.Parameters
@@ -66,35 +84,43 @@ public class ChequeManagementTest {
 
     @Test
     public void itShouldCreateAndAssignCheque() throws JsonProcessingException {
-        String response = postAddCheque(validCheque);
+        String response = postAddCheque(validCheque, branchManager);
         assertTrue("Success should be true and id should be return", response.contains("\"id\"") && response.contains("\"success\": true"));
     }
 
     @Test
     public void itShouldNotCreateChequeWithInvalidStartOrEnd() throws JsonProcessingException {
-        String response = postAddCheque(invalidCheque);
+        String response = postAddCheque(invalidCheque, branchManager);
         assertTrue("Success should be false because of invalid input", response.contains("\"success\": false"));
     }
 
     @Test
     public void itShouldNotCreateChequeWithUsedLeaves() throws JsonProcessingException {
         itShouldCreateAndAssignCheque();
-        String response = postAddCheque(validCheque);
+        String response = postAddCheque(validCheque, branchManager);
         Assert.assertTrue("Success should be false and message should say cheque leaves already in use",
                response.contains("Cheque Leaves in use") && response.contains("\"success\":false"));
     }
 
-    private String postAddCheque(Cheque cheque) throws JsonProcessingException {
+    @Test
+    public void itShouldNotCreateChequeIfNotBranchManager() throws JsonProcessingException {
+        String response = postAddCheque(validCheque, adminUser);
+        Assert.assertTrue("It should say you do not have branch manager role", response.contains("BRANCH MANAGER"));
+    }
+
+
+    private String postAddCheque(Cheque cheque, UserDTO userDTO) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
         //Object to JSON in String
         String json = mapper.writeValueAsString(cheque);
 
         Response r = given()
-                .contentType("application/json").
+                .contentType("application/json")
+                .auth().basic(userDTO.getUsername(), userDTO.getPassword()).
                         body(json).
                         when().
-                        post("/cheque");
+                        post("/cheques");
 
         String body = r.getBody().asString();
         System.out.println(body);

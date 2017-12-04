@@ -30,6 +30,7 @@ public class UserManagementTest {
     public UserDTO invalidUser;
 
     public UserDTO validUser;
+    private UserDTO adminUser;
 
     @Parameterized.Parameters
     public static Collection<UserDTO> data() {
@@ -61,35 +62,36 @@ public class UserManagementTest {
 
     @Test
     public void itShouldCreateNewUser() throws JsonProcessingException {
-        String response = postAddUser(validUser);
+        String response = postAddUser(validUser, adminUser);
         assertTrue("Success should be false because of invalid input", response.contains("\"success\": false"));
     }
 
     @Test
     public void itShouldNotCreateDuplicateUsers() throws JsonProcessingException {
         itShouldCreateNewUser();
-        String response = postAddUser(validUser);
+        String response = postAddUser(validUser, adminUser);
         Assert.assertTrue("Success should be false and message should say Username is in use",
                 response.contains("Username in use") && response.contains("\"success\":false"));
     }
 
     @Test
     public void itShouldNotCreateInvalidUser() throws JsonProcessingException {
-        String response = postAddUser(invalidUser);
+        String response = postAddUser(invalidUser, adminUser);
         assertTrue("Success should be false because of invalid input", response.contains("An Error Occurred"));
     }
 
-    private String postAddUser(UserDTO user) throws JsonProcessingException {
+    private String postAddUser(UserDTO user, UserDTO userDTO) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
 
         //Object to JSON in String
         String json = mapper.writeValueAsString(user);
 
         Response r = given()
-                .contentType("application/json").
+                .contentType("application/json")
+                .auth().basic(userDTO.getUsername(), userDTO.getPassword()).
                         body(json).
                         when().
-                        post("/user");
+                        post("/users");
 
         String body = r.getBody().asString();
         System.out.println(body);
