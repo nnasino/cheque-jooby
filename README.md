@@ -39,17 +39,19 @@ BRANCH_MANAGER
 LOAN_OFFICER
 
 ### Summary of Endpoints
-  POST /users               [*/*]     [*/*]    (/anonymous)
-  GET  /users/{id:\d+}      [*/*]     [*/*]    (/anonymous)
-  GET  /users               [*/*]     [*/*]    (/anonymous)
-  POST /cheques             [*/*]     [*/*]    (/anonymous)
-  GET  /cheques             [*/*]     [*/*]    (/anonymous)
-  GET  /cheques/{id:\d+}    [*/*]     [*/*]    (/anonymous)
-  POST /loans               [*/*]     [*/*]    (/anonymous)
-  GET  /loans/{id:\d+}      [*/*]     [*/*]    (/anonymous)
-  GET  /loans               [*/*]     [*/*]    (/anonymous)
-  GET  /branches            [*/*]     [*/*]    (/anonymous)
-  POST /branches            [*/*]     [*/*]    (/anonymous)
+<ul>
+  <li>POST /users               </li>
+  <li>GET  /users/{id:\d+}      </li>
+  <li>GET  /users               </li>
+  <li>POST /cheques             </li>
+  <li>GET  /cheques             </li>
+  <li>GET  /cheques/{id:\d+}    </li>
+  <li>POST /loans               </li>
+  <li>GET  /loans/{id:\d+}      </li>
+  <li>GET  /loans               </li>
+  <li>GET  /branches            </li>
+  <li>POST /branches            </li>
+</ul>
 
  The required inputs for the API endpoints can be found in the DTO classes in the ```mini.jooby.dtos``` package.
  
