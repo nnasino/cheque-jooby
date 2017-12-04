@@ -20,7 +20,7 @@
         <jooby.version>1.2.3</jooby.version>
 
         <!-- Startup class -->
-        <application.class>starter.ebean.App</application.class>
+        <application.class>mini.jooby.App</application.class>
     </properties>
 
     <dependencies>
