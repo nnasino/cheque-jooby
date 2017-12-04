@@ -1,17 +1,19 @@
 package mini.jooby.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.Model;
 
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
 import java.time.LocalDateTime;
 
 @MappedSuperclass
 public abstract class AbstractEntity extends Model{
     @Id
     private Long id;
-    @OneToOne
+    @ManyToOne
+    @JsonIgnore
     private User addedBy;
     private LocalDateTime addedOn = LocalDateTime.now();
 

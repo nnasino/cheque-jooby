@@ -51,13 +51,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Long addCustomer(CustomerDTO customerDTO, User addedBy) {
+    public Customer addCustomer(CustomerDTO customerDTO, User addedBy) {
         validateCustomer(customerDTO);
         Customer customer = toEntity(customerDTO);
         customer.setAddedBy(addedBy);
         ebean.insert(customer);
         logger.info("Successfully added: {}", customer.toString());
-        return customer.getId();
+        return customer;
     }
 
     @Override

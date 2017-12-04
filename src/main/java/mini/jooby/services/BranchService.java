@@ -19,7 +19,7 @@ public interface BranchService {
      * @param branch the Branch Data transfer object to be saved
      * @return the db id of the saved Branch
      */
-    Long addBranch(BranchDTO branch, User addedBy);
+    Branch addBranch(BranchDTO branch, User addedBy);
 
     /** Finds the {@link Branch} record with the specified db id
      *

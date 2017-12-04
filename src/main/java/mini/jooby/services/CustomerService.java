@@ -13,7 +13,7 @@ public interface CustomerService {
      * @param customerDTO the Customer object to be saved
      * @return the db id of the saved Customer
      */
-    Long addCustomer(CustomerDTO customerDTO, User addedBy);
+    Customer addCustomer(CustomerDTO customerDTO, User addedBy);
 
     /** Finds the {@link Customer} record with the specified db id
      *

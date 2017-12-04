@@ -15,7 +15,7 @@ public interface LoanService {
      * @param loanDTO the Loan object to be saved
      * @return the db id of the saved Loan
      */
-    Long addLoan(LoanDTO loanDTO, User addedBy);
+    Loan addLoan(LoanDTO loanDTO, User addedBy);
     /** Finds the {@link Loan} record with the specified db id
      *
      * @param id the db id of the required Loan

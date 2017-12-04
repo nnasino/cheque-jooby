@@ -60,7 +60,7 @@ public class LoanServiceImpl implements LoanService {
     }
 
     @Override
-    public Long addLoan(LoanDTO loanDTO, User addedBy) {
+    public Loan addLoan(LoanDTO loanDTO, User addedBy) {
         validateLoan(loanDTO);
 
         logger.info(addedBy.toString());
@@ -76,15 +76,14 @@ public class LoanServiceImpl implements LoanService {
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setCustomerName(loanDTO.getCustomerName());
             customerDTO.setCustomerNumber(loanDTO.getCustomerNumber());
-            Long id = customerService.addCustomer(customerDTO, addedBy);
-            customer = customerService.findCustomerById(id);
+            customer = customerService.addCustomer(customerDTO, addedBy);
         }
 
         loan.setCustomer(customer);
         loan.setAddedBy(addedBy);
         ebean.insert(loan);
         logger.info("Successfully added: {}", loan.toString());
-        return loan.getId();
+        return loan;
     }
 
     @Override

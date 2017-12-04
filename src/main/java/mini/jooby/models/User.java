@@ -1,5 +1,7 @@
 package mini.jooby.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -8,12 +10,14 @@ public class User extends AbstractEntity {
 
     @Column(unique = true)
     private String username;
+    @JsonIgnore
     private String passwordHash;
     @ManyToOne
     private Branch branch;
     @Enumerated(value = EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List<Cheque> cheques;
 
     public String getUsername() {

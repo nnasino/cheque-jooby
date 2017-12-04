@@ -97,7 +97,7 @@ public class ChequeServiceImpl implements ChequeService{
     }
 
     @Override
-    public Long addCheque(ChequeDTO chequeDTO, User addedBy) {
+    public Cheque addCheque(ChequeDTO chequeDTO, User addedBy) {
         validateCheque(chequeDTO);
         User user = userService.findUserById(chequeDTO.getUserId());
         Cheque cheque = toEntity(chequeDTO);
@@ -105,7 +105,7 @@ public class ChequeServiceImpl implements ChequeService{
         cheque.setUser(user);
         ebean.insert(cheque);
         logger.info("Successfully added: {}", cheque.toString());
-        return cheque.getId();
+        return cheque;
     }
 
     @Override

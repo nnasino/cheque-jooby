@@ -64,7 +64,7 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public Long addBranch(BranchDTO branchDTO, User addedBy) {
+    public Branch addBranch(BranchDTO branchDTO, User addedBy) {
         validateBranch(branchDTO);
         Branch branch = toEntity(branchDTO);
         branch.setAddedBy(addedBy);
@@ -75,7 +75,7 @@ public class BranchServiceImpl implements BranchService {
 
         ebean.insert(branch);
         logger.info("Successfully added: {}", branch.toString());
-        return branch.getId();
+        return branch;
     }
 
     @Override

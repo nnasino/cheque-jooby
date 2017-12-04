@@ -66,40 +66,43 @@ public class App extends Jooby {
             EbeanServer ebean = require(EbeanServer.class);
             //Add branches and default admin user
 
-            Branch branch = new Branch();
-            branch.setBranchCode("0001");
-            branch.setBranchName("Head Office");
-            ebean.insert(branch);
-            BranchDTO ojuelegba = new BranchDTO("Ojuelegba Road", "0002");
-            ebean.insert(branchService.toEntity(ojuelegba));
-            BranchDTO johnRoad = new BranchDTO("John Road", "0003");
-            ebean.insert(branchService.toEntity(johnRoad));
-            BranchDTO marina = new BranchDTO("Marina", "0004");
-            ebean.insert(branchService.toEntity(marina));
-            BranchDTO ajose = new BranchDTO("Ajose Adeogun", "0005");
-            ebean.insert(branchService.toEntity(ajose));
+            if(ebean.find(Branch.class).findCount() <= 0) {
+                Branch branch = new Branch();
+                branch.setBranchCode("0001");
+                branch.setBranchName("Head Office");
+                ebean.insert(branch);
+                BranchDTO ojuelegba = new BranchDTO("Ojuelegba Road", "0002");
+                ebean.insert(branchService.toEntity(ojuelegba));
+                BranchDTO johnRoad = new BranchDTO("John Road", "0003");
+                ebean.insert(branchService.toEntity(johnRoad));
+                BranchDTO marina = new BranchDTO("Marina", "0004");
+                ebean.insert(branchService.toEntity(marina));
+                BranchDTO ajose = new BranchDTO("Ajose Adeogun", "0005");
+                ebean.insert(branchService.toEntity(ajose));
+            }
 
 
-            User user = new User();
-            user.setBranch(branch);
-            user.setPasswordHash(securityService.createPassword("password123"));
-            user.setUsername("administrator");
-            user.setRole(Role.ADMIN);
-            ebean.insert(user);
+            if(ebean.find(User.class).findCount() <= 0) {
+                User user = new User();
+                user.setPasswordHash(securityService.createPassword("password123"));
+                user.setUsername("administrator");
+                user.setRole(Role.ADMIN);
+                ebean.insert(user);
 
-            user = new User();
-            user.setBranch(branch);
-            user.setPasswordHash(securityService.createPassword("password123"));
-            user.setUsername("john.bola");
-            user.setRole(Role.LOAN_OFFICER);
-            ebean.insert(user);
+                user = new User();
+                user.setPasswordHash(securityService.createPassword("password123"));
+                user.setUsername("john.bola");
+                user.setRole(Role.LOAN_OFFICER);
+                ebean.insert(user);
 
-            user = new User();
-            user.setBranch(branch);
-            user.setPasswordHash(securityService.createPassword("password123"));
-            user.setUsername("daniel.wale");
-            user.setRole(Role.BRANCH_MANAGER);
-            ebean.insert(user);
+                user = new User();
+                user.setPasswordHash(securityService.createPassword("password123"));
+                user.setUsername("daniel.wale");
+                user.setRole(Role.BRANCH_MANAGER);
+                ebean.insert(user);
+            }
+
+
         });
 
         //User API
@@ -112,7 +115,7 @@ public class App extends Jooby {
             UserDTO user = null;
             try {
                 user = req.body().to(UserDTO.class);
-                user.setId(userService.addUser(user, getLoggedInUser()));
+                return userService.addUser(user, getLoggedInUser());
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -120,8 +123,6 @@ public class App extends Jooby {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: username, password, branch, role \"}";
             }
-            logger.info(user.toString());
-            return user;
         });
 
         /**
@@ -167,7 +168,7 @@ public class App extends Jooby {
             ChequeDTO chequeDTO = null;
             try {
                 chequeDTO = req.body().to(ChequeDTO.class);
-                chequeDTO.setId(chequeService.addCheque(chequeDTO, getLoggedInUser()));
+                return chequeService.addCheque(chequeDTO, getLoggedInUser());
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -175,8 +176,6 @@ public class App extends Jooby {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: bankName, endNumber, startNumber, userId \"}";
             }
-            logger.info(chequeDTO.toString());
-            return chequeDTO;
         });
 
         /**
@@ -207,7 +206,7 @@ public class App extends Jooby {
             LoanDTO loanDTO = null;
             try {
                 loanDTO = req.body().to(LoanDTO.class);
-                loanDTO.setId(loanService.addLoan(loanDTO, getLoggedInUser()));
+                return loanService.addLoan(loanDTO, getLoggedInUser());
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -216,8 +215,6 @@ public class App extends Jooby {
                 return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: customerName, " +
                         "customerNumber, loanAmount \"}";
             }
-            logger.info(loanDTO.toString());
-            return loanDTO;
         });
 
         /**
@@ -240,6 +237,26 @@ public class App extends Jooby {
         });
 
 
+        //Branch api
+        get("/branches", req -> {
+            return branchService.findAll();
+        });
+
+        post("/branches", req -> {
+BranchDTO branchDTO = null;
+            try {
+                branchDTO = req.body().to(BranchDTO.class);
+                return branchService.addBranch(branchDTO, getLoggedInUser());
+            } catch (IllegalArgumentException exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
+            } catch (Exception exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: branchName, " +
+                        "branchCode\"}";
+            }
+        });
+
     }
 
     private User getLoggedInUser(){
@@ -252,7 +269,6 @@ public class App extends Jooby {
         try {
             page = req.param("page").intValue();
         } catch (Exception exc) {
-            logger.error("Unable to parse page param:" + exc.getMessage());
         }
         return page;
     }
@@ -262,7 +278,6 @@ public class App extends Jooby {
         try {
             pageSize = req.param("pageSize").intValue();
         } catch (Exception exc) {
-            logger.error("Unable to parse pageSize param:" + exc.getMessage());
         }
         return pageSize;
     }
