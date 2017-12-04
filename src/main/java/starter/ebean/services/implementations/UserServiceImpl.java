@@ -8,6 +8,7 @@ import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.User;
 import starter.ebean.models.query.QUser;
 import starter.ebean.services.BranchService;
+import starter.ebean.services.SecurityService;
 import starter.ebean.services.UserService;
 
 import javax.validation.ConstraintViolation;
@@ -22,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     @Inject
     private EbeanServer ebean;
+    @Inject
+    private SecurityService securityService;
     @Inject
     private BranchService branchService;
 
@@ -54,7 +57,7 @@ public class UserServiceImpl implements UserService {
     private User toEntity(UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
-        user.setPasswordHash(userDTO.getPassword());
+        user.setPasswordHash(securityService.createPassword(userDTO.getPassword()));
         user.setRole(userDTO.getRole());
         user.setBranch(branchService.findBranchByCode(userDTO.getBranch()));
         return user;
