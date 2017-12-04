@@ -18,14 +18,12 @@ import starter.ebean.dtos.LoanDTO;
 import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.Branch;
 import starter.ebean.models.Role;
-import starter.ebean.services.BranchService;
-import starter.ebean.services.ChequeService;
-import starter.ebean.services.LoanService;
-import starter.ebean.services.UserService;
+import starter.ebean.models.User;
+import starter.ebean.services.*;
 import starter.ebean.services.implementations.SecurityServiceImpl;
 
 /**
- * Starter project for Ebean ORM.
+ * Mini project assignment.
  */
 public class App extends Jooby {
 
@@ -36,6 +34,8 @@ public class App extends Jooby {
     private ChequeService chequeService;
     @Inject
     private UserService userService;
+    @Inject
+    private SecurityService securityService;
 
     @Inject
     private LoanService loanService;
@@ -57,7 +57,6 @@ public class App extends Jooby {
         }));
 
         use(new AppModule());
-//        use(new Auth().basic());
         use(new Auth().basic("*", SecurityServiceImpl.class));
 
         /**
@@ -81,13 +80,26 @@ public class App extends Jooby {
             ebean.insert(branchService.toEntity(ajose));
 
 
-            UserDTO userDTO = new UserDTO();
-            userDTO.setBranch(branch.getBranchCode());
-            userDTO.setPassword("password123");
-            userDTO.setUsername("administrator");
-            userDTO.setRole(Role.ADMIN);
-            userService.addUser(userDTO);
+            User user = new User();
+            user.setBranch(branch);
+            user.setPasswordHash(securityService.createPassword("password123"));
+            user.setUsername("administrator");
+            user.setRole(Role.ADMIN);
+            ebean.insert(user);
 
+            user = new User();
+            user.setBranch(branch);
+            user.setPasswordHash(securityService.createPassword("password123"));
+            user.setUsername("john.bola");
+            user.setRole(Role.LOAN_OFFICER);
+            ebean.insert(user);
+
+            user = new User();
+            user.setBranch(branch);
+            user.setPasswordHash(securityService.createPassword("password123"));
+            user.setUsername("daniel.wale");
+            user.setRole(Role.BRANCH_MANAGER);
+            ebean.insert(user);
         });
 
         //User API
@@ -100,7 +112,7 @@ public class App extends Jooby {
             UserDTO user = null;
             try {
                 user = req.body().to(UserDTO.class);
-                user.setId(userService.addUser(user));
+                user.setId(userService.addUser(user, getLoggedInUser()));
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -155,7 +167,7 @@ public class App extends Jooby {
             ChequeDTO chequeDTO = null;
             try {
                 chequeDTO = req.body().to(ChequeDTO.class);
-                chequeDTO.setId(chequeService.addCheque(chequeDTO));
+                chequeDTO.setId(chequeService.addCheque(chequeDTO, getLoggedInUser()));
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -195,7 +207,7 @@ public class App extends Jooby {
             LoanDTO loanDTO = null;
             try {
                 loanDTO = req.body().to(LoanDTO.class);
-                loanDTO.setId(loanService.addLoan(loanDTO));
+                loanDTO.setId(loanService.addLoan(loanDTO, getLoggedInUser()));
             } catch (IllegalArgumentException exc) {
                 logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
@@ -228,6 +240,11 @@ public class App extends Jooby {
         });
 
 
+    }
+
+    private User getLoggedInUser(){
+        CommonProfile commonProfile = require(CommonProfile.class);
+        return userService.findUserById(Long.parseLong(commonProfile.getId()));
     }
 
     public static int getPageParam(Request req) {

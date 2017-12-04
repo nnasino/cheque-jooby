@@ -84,13 +84,7 @@ public class ChequeServiceImpl implements ChequeService{
                 //cheque leaves already taken
                 throw new IllegalArgumentException("Some of the cheque leaves are in use") ;
             }
-
-//            if(chequeDTO.getStartNumber() >= cheque.getStartNumber()
-//            || chequeDTO.getEndNumber() <= cheque.getEndNumber()){
-//                cheque leaves already taken
-//                throw new IllegalArgumentException("Some of the cheque leaves are in use") ;
-//            }
-        }
+       }
 
     }
 
@@ -103,12 +97,14 @@ public class ChequeServiceImpl implements ChequeService{
     }
 
     @Override
-    public Long addCheque(ChequeDTO chequeDTO) {
+    public Long addCheque(ChequeDTO chequeDTO, User addedBy) {
         validateCheque(chequeDTO);
         User user = userService.findUserById(chequeDTO.getUserId());
         Cheque cheque = toEntity(chequeDTO);
+        cheque.setAddedBy(addedBy);
         cheque.setUser(user);
         ebean.insert(cheque);
+        logger.info("Successfully added: {}", cheque.toString());
         return cheque.getId();
     }
 

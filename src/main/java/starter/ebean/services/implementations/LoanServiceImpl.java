@@ -40,7 +40,6 @@ public class LoanServiceImpl implements LoanService {
     private Loan toEntity(LoanDTO loanDTO){
         Loan loan = new Loan();
         loan.setLoanAmount(loanDTO.getLoanAmount());
-        loan.setAddedBy(userService.findUserById(loanDTO.getUserId()));
         return loan;
     }
 
@@ -58,35 +57,34 @@ public class LoanServiceImpl implements LoanService {
             throw new IllegalArgumentException(builder.toString());
         }
 
-        //confirm that the specified user exists and has loan officer role
-        User user = userService.findUserById(loanDTO.getUserId());
-
-        if(user == null){
-            throw new IllegalArgumentException("User was not found");
-        }
-
-        if(user.getRole() != Role.LOAN_OFFICER){
-            throw new IllegalArgumentException("You do not have the LOAN OFFICER role");
-        }
 
     }
 
     @Override
-    public Long addLoan(LoanDTO loanDTO) {
+    public Long addLoan(LoanDTO loanDTO, User addedBy) {
         validateLoan(loanDTO);
+
+        logger.info(addedBy.toString());
+        if(addedBy.getRole() != Role.LOAN_OFFICER){
+            throw new IllegalArgumentException("Insufficient Privileges: You do not have the LOAN OFFICER role");
+        }
+
         Loan loan = toEntity(loanDTO);
+
         Customer customer = customerService.findCustomerByCustomerNumber(loanDTO.getCustomerNumber());
 
         if(customer == null){
             CustomerDTO customerDTO = new CustomerDTO();
             customerDTO.setCustomerName(loanDTO.getCustomerName());
             customerDTO.setCustomerNumber(loanDTO.getCustomerNumber());
-            Long id = customerService.addCustomer(customerDTO);
+            Long id = customerService.addCustomer(customerDTO, addedBy);
             customer = customerService.findCustomerById(id);
         }
 
         loan.setCustomer(customer);
+        loan.setAddedBy(addedBy);
         ebean.insert(loan);
+        logger.info("Successfully added: {}", loan.toString());
         return loan.getId();
     }
 

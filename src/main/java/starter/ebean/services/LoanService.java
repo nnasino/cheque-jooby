@@ -2,6 +2,7 @@ package starter.ebean.services;
 
 import starter.ebean.dtos.LoanDTO;
 import starter.ebean.models.Loan;
+import starter.ebean.models.User;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public interface LoanService {
      * @param loanDTO the Loan object to be saved
      * @return the db id of the saved Loan
      */
-    Long addLoan(LoanDTO loanDTO);
+    Long addLoan(LoanDTO loanDTO, User addedBy);
     /** Finds the {@link starter.ebean.models.Loan} record with the specified db id
      *
      * @param id the db id of the required Loan

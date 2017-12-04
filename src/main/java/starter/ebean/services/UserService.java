@@ -16,7 +16,7 @@ public interface UserService {
      * @param user the User object to be saved
      * @return the db id of the saved User
      */
-    Long addUser(UserDTO user);
+    Long addUser(UserDTO user, User addedBy);
 
     /**
      * Finds the {@link starter.ebean.models.User} record with the specified db id

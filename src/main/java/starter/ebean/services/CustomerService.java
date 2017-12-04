@@ -2,6 +2,7 @@ package starter.ebean.services;
 
 import starter.ebean.dtos.CustomerDTO;
 import starter.ebean.models.Customer;
+import starter.ebean.models.User;
 
 /** Service for handling manipulation of all {@link starter.ebean.models.Customer} objects
  *
@@ -12,7 +13,7 @@ public interface CustomerService {
      * @param customerDTO the Customer object to be saved
      * @return the db id of the saved Customer
      */
-    Long addCustomer(CustomerDTO customerDTO);
+    Long addCustomer(CustomerDTO customerDTO, User addedBy);
 
     /** Finds the {@link starter.ebean.models.Customer} record with the specified db id
      *

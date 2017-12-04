@@ -14,7 +14,6 @@ public class LoanDTO {
     private String customerNumber;
     @Min(1)
     private BigDecimal loanAmount;
-    private Long userId;
 
     public Long getId() {
         return id;
@@ -48,14 +47,6 @@ public class LoanDTO {
         this.loanAmount = loanAmount;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     @Override
     public String toString() {
         return "LoanDTO{" +
@@ -63,7 +54,6 @@ public class LoanDTO {
                 ", customerName='" + customerName + '\'' +
                 ", customerNumber='" + customerNumber + '\'' +
                 ", loanAmount=" + loanAmount +
-                ", userId=" + userId +
                 '}';
     }
 }

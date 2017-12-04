@@ -4,6 +4,7 @@ import starter.ebean.dtos.BranchDTO;
 import starter.ebean.dtos.ResponseMessage;
 import starter.ebean.models.Branch;
 import starter.ebean.models.Branch;
+import starter.ebean.models.User;
 
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface BranchService {
      * @param branch the Branch Data transfer object to be saved
      * @return the db id of the saved Branch
      */
-    Long addBranch(BranchDTO branch);
+    Long addBranch(BranchDTO branch, User addedBy);
 
     /** Finds the {@link starter.ebean.models.Branch} record with the specified db id
      *
@@ -41,5 +42,4 @@ public interface BranchService {
      */
     List<Branch> findAll();
 
-    ResponseMessage assignBranchToUser(Long BranchId, Long userId);
 }

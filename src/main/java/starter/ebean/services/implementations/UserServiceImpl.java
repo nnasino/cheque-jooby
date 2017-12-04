@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Long addUser(UserDTO userDTO) {
+    public Long addUser(UserDTO userDTO, User addedBy) {
         validateUser(userDTO);
         User user = toEntity(userDTO);
 
@@ -71,8 +71,9 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Specified user already exists");
         }
 
+        user.setAddedBy(addedBy);
         ebean.insert(user);
-        logger.info(user.toString());
+        logger.info("Successfully added: {}", user.toString());
         return user.getId();
     }
 

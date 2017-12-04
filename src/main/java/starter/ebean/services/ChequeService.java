@@ -17,7 +17,7 @@ public interface ChequeService {
      * @param chequeDTO the Cheque object to be saved
      * @return the db id of the saved Cheque
      */
-    Long addCheque(ChequeDTO chequeDTO);
+    Long addCheque(ChequeDTO chequeDTO, User addedBy);
 
     /** Finds the {@link starter.ebean.models.Cheque} record with the specified db id
      *
