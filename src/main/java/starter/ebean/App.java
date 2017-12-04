@@ -8,16 +8,21 @@ import org.jooby.Request;
 import org.jooby.ebean.Ebeanby;
 import org.jooby.jdbc.Jdbc;
 import org.jooby.json.Jackson;
+import org.jooby.pac4j.Auth;
+import org.pac4j.core.profile.CommonProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import starter.ebean.dtos.BranchDTO;
 import starter.ebean.dtos.ChequeDTO;
+import starter.ebean.dtos.LoanDTO;
 import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.Branch;
 import starter.ebean.models.Role;
 import starter.ebean.services.BranchService;
 import starter.ebean.services.ChequeService;
+import starter.ebean.services.LoanService;
 import starter.ebean.services.UserService;
+import starter.ebean.services.implementations.SecurityServiceImpl;
 
 /**
  * Starter project for Ebean ORM.
@@ -31,6 +36,9 @@ public class App extends Jooby {
     private ChequeService chequeService;
     @Inject
     private UserService userService;
+
+    @Inject
+    private LoanService loanService;
 
     {
         use(new Jackson());
@@ -49,6 +57,8 @@ public class App extends Jooby {
         }));
 
         use(new AppModule());
+//        use(new Auth().basic());
+        use(new Auth().basic("*", SecurityServiceImpl.class));
 
         /**
          * Insert some data on startup:
@@ -85,6 +95,8 @@ public class App extends Jooby {
          *
          */
         post("/users", req -> {
+            CommonProfile commonProfile = require(CommonProfile.class);
+            logger.info("{}", commonProfile.getUsername());
             UserDTO user = null;
             try {
                 user = req.body().to(UserDTO.class);
@@ -136,6 +148,9 @@ public class App extends Jooby {
 
 
         //Cheque API
+        /** Add and assign cheque
+         *
+         */
         post("/cheques", req -> {
             ChequeDTO chequeDTO = null;
             try {
@@ -152,6 +167,10 @@ public class App extends Jooby {
             return chequeDTO;
         });
 
+        /**
+         * Find all cheques. can also take page and pageSize to control
+         * records returned. Returns first 10 records by default
+         */
         get("/cheques", req -> {
             int page = getPageParam(req);
             int pageSize = getPageSizeParam(req);
@@ -159,11 +178,56 @@ public class App extends Jooby {
             return chequeService.findPage(page, pageSize);
         });
 
-
+        /**
+         * Find cheque by id
+         */
         get("/cheques/{id:\\d+}", req -> {
             Long id = req.param("id").longValue();
             return chequeService.findChequeById(id);
         });
+
+
+        //Loan disbursement API
+        /** Add and assign cheque
+         *
+         */
+        post("/loans", req -> {
+            LoanDTO loanDTO = null;
+            try {
+                loanDTO = req.body().to(LoanDTO.class);
+                loanDTO.setId(loanService.addLoan(loanDTO));
+            } catch (IllegalArgumentException exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
+            } catch (Exception exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: customerName, " +
+                        "customerNumber, loanAmount \"}";
+            }
+            logger.info(loanDTO.toString());
+            return loanDTO;
+        });
+
+        /**
+         * Find loan by id
+         */
+        get("/loans/{id:\\d+}", req -> {
+            Long id = req.param("id").longValue();
+            return loanService.findLoanById(id);
+        });
+
+        /**
+         * Find all Loans. can also take page and pageSize to control
+         * records returned. Returns first 10 records by default
+         */
+        get("/loans", req -> {
+            int page = getPageParam(req);
+            int pageSize = getPageSizeParam(req);
+
+            return loanService.findPage(page, pageSize);
+        });
+
+
     }
 
     public static int getPageParam(Request req) {

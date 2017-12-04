@@ -9,7 +9,6 @@ import starter.ebean.dtos.ResponseMessage;
 import starter.ebean.models.Cheque;
 import starter.ebean.models.Role;
 import starter.ebean.models.User;
-import starter.ebean.models.query.QCheque;
 import starter.ebean.services.ChequeService;
 import starter.ebean.services.UserService;
 
@@ -53,8 +52,8 @@ public class ChequeServiceImpl implements ChequeService{
             throw new IllegalArgumentException("User was not found");
         }
 
-        if(user.getRole() != Role.LOAN_OFFICER){
-            throw new IllegalArgumentException("User does not have the LOAN OFFICER role");
+        if(user.getRole() != Role.BRANCH_MANAGER){
+            throw new IllegalArgumentException("Specified User does not have the BRANCH_MANAGER role");
         }
 
         //check range shouldn't be more than 200
@@ -120,13 +119,9 @@ public class ChequeServiceImpl implements ChequeService{
 
     @Override
     public List<Cheque> findPage(int page, int pageSize){
-        int firstRow = (page * pageSize) - pageSize;
-        logger.info("page: {}, pageSize: {}, firstRow: {}, totalRecords: {}", page, pageSize, firstRow
-        , ebean.find(Cheque.class).findCount());
-
         return ebean.find(Cheque.class)
                 .setMaxRows(pageSize)
-                .setFirstRow(firstRow)
+                .setFirstRow((page * pageSize) - pageSize)
                 .findList();
     }
 

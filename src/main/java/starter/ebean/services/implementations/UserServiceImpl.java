@@ -85,7 +85,15 @@ public class UserServiceImpl implements UserService {
     public List<User> findPage(int page, int pageSize) {
         return ebean.find(User.class)
                 .setMaxRows(pageSize)
-                .setFirstRow((page * pageSize) - pageSize+ 1)
+                .setFirstRow((page * pageSize) - pageSize)
                 .findList();
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return ebean.find(User.class)
+                .where()
+                .eq("username", username)
+                .findUnique();
     }
 }

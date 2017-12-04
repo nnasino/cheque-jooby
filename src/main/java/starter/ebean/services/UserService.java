@@ -32,4 +32,6 @@ public interface UserService {
      * @return List of Cheques
      */
     List<User> findPage(int page, int pageSize);
+
+    User findUserByUsername(String username);
 }

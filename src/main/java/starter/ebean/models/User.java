@@ -11,6 +11,7 @@ public class User extends AbstractEntity {
     private String passwordHash;
     @ManyToOne
     private Branch branch;
+    @Enumerated(value = EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "user")
     private List<Cheque> cheques;
