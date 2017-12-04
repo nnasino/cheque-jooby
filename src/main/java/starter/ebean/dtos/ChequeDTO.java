@@ -1,19 +1,29 @@
-package starter.ebean.models;
+package starter.ebean.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-
-@Entity
-public class Cheque extends AbstractEntity{
+public class ChequeDTO {
+    private Long id;
+    @NotEmpty
     private String bankName;
+    @Min(1)
     private int startNumber;
+    @Min(2)
+    @Max(888888888)
     private int endNumber;
+    @NotNull
+    private Long userId;
 
-    @ManyToOne
-    @JsonIgnore
-    private User user;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getBankName() {
         return bankName;
@@ -39,20 +49,22 @@ public class Cheque extends AbstractEntity{
         this.endNumber = endNumber;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     @Override
     public String toString() {
-        return "Cheque{" +
-                "bankName='" + bankName + '\'' +
+        return "ChequeDTO{" +
+                "id=" + id +
+                ", bankName='" + bankName + '\'' +
                 ", startNumber=" + startNumber +
                 ", endNumber=" + endNumber +
+                ", userId=" + userId +
                 '}';
     }
 }

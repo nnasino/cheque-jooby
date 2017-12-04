@@ -13,7 +13,7 @@ public abstract class AbstractEntity extends Model{
     private Long id;
     @OneToOne
     private User addedBy;
-    private LocalDateTime addedOn;
+    private LocalDateTime addedOn = LocalDateTime.now();
 
     public Long getId() {
         return id;

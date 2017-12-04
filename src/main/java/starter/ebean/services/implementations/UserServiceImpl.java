@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.User;
-import starter.ebean.models.query.QUser;
 import starter.ebean.services.BranchService;
 import starter.ebean.services.SecurityService;
 import starter.ebean.services.UserService;
@@ -35,10 +34,6 @@ public class UserServiceImpl implements UserService {
                 .findCount() > 0;
     }
 
-    private String encryptPassword(String plainPassword) {
-        //TODO encrypt
-        return plainPassword;
-    }
 
     private void validateUser(UserDTO userDTO) {
         Validator validator = factory.getValidator();

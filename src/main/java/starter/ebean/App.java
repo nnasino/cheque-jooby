@@ -4,19 +4,17 @@ import com.google.inject.Inject;
 import io.ebean.EbeanServer;
 import io.ebean.config.ServerConfig;
 import org.jooby.Jooby;
+import org.jooby.Request;
 import org.jooby.ebean.Ebeanby;
 import org.jooby.jdbc.Jdbc;
 import org.jooby.json.Jackson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import starter.ebean.dtos.BranchDTO;
-import starter.ebean.dtos.ResponseMessage;
+import starter.ebean.dtos.ChequeDTO;
 import starter.ebean.dtos.UserDTO;
 import starter.ebean.models.Branch;
 import starter.ebean.models.Role;
-import starter.ebean.models.User;
-import starter.ebean.models.query.QBranch;
-import starter.ebean.models.query.QUser;
 import starter.ebean.services.BranchService;
 import starter.ebean.services.ChequeService;
 import starter.ebean.services.UserService;
@@ -26,15 +24,14 @@ import starter.ebean.services.UserService;
  */
 public class App extends Jooby {
 
+    private final static Logger logger = LoggerFactory.getLogger(App.class);
     @Inject
     private BranchService branchService;
-
     @Inject
     private ChequeService chequeService;
-
     @Inject
     private UserService userService;
-    private final static Logger logger = LoggerFactory.getLogger(App.class);
+
     {
         use(new Jackson());
 
@@ -81,7 +78,7 @@ public class App extends Jooby {
             userDTO.setRole(Role.ADMIN);
             userService.addUser(userDTO);
 
-       });
+        });
 
         //User API
         /** Add a new user to the system
@@ -93,13 +90,13 @@ public class App extends Jooby {
                 user = req.body().to(UserDTO.class);
                 user.setId(userService.addUser(user));
             } catch (IllegalArgumentException exc) {
-                exc.printStackTrace();
-                return "{ \"message\": \"An Error Occurred: " + exc.getMessage() +" \"}";
-            }catch (Exception exc){
-                exc.printStackTrace();
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
+            } catch (Exception exc) {
+                logger.error("Error: {}", exc.getMessage());
                 return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: username, password, branch, role \"}";
             }
-            System.out.println(user.toString());
+            logger.info(user.toString());
             return user;
         });
 
@@ -121,23 +118,72 @@ public class App extends Jooby {
             int pageSize = 10;
 
             //check for page
-            try{
+            try {
                 page = req.param("page").intValue();
-            }catch (Exception exc){
+            } catch (Exception exc) {
                 logger.error("Unable to parse page param:" + exc.getMessage());
             }
 
             //check for pageSize
-            try{
+            try {
                 page = req.param("pageSize").intValue();
-            }catch (Exception exc){
+            } catch (Exception exc) {
                 logger.error("Unable to parse pageSize param:" + exc.getMessage());
             }
 
-            return userService.findPage(page,pageSize);
+            return userService.findPage(page, pageSize);
         });
 
 
+        //Cheque API
+        post("/cheques", req -> {
+            ChequeDTO chequeDTO = null;
+            try {
+                chequeDTO = req.body().to(ChequeDTO.class);
+                chequeDTO.setId(chequeService.addCheque(chequeDTO));
+            } catch (IllegalArgumentException exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: " + exc.getMessage() + " \"}";
+            } catch (Exception exc) {
+                logger.error("Error: {}", exc.getMessage());
+                return "{ \"message\": \"An Error Occurred: Invalid inputs supplied. Expected fields: bankName, endNumber, startNumber, userId \"}";
+            }
+            logger.info(chequeDTO.toString());
+            return chequeDTO;
+        });
+
+        get("/cheques", req -> {
+            int page = getPageParam(req);
+            int pageSize = getPageSizeParam(req);
+
+            return chequeService.findPage(page, pageSize);
+        });
+
+
+        get("/cheques/{id:\\d+}", req -> {
+            Long id = req.param("id").longValue();
+            return chequeService.findChequeById(id);
+        });
+    }
+
+    public static int getPageParam(Request req) {
+        int page = 1;
+        try {
+            page = req.param("page").intValue();
+        } catch (Exception exc) {
+            logger.error("Unable to parse page param:" + exc.getMessage());
+        }
+        return page;
+    }
+
+    public static int getPageSizeParam(Request req) {
+        int pageSize = 10;
+        try {
+            pageSize = req.param("pageSize").intValue();
+        } catch (Exception exc) {
+            logger.error("Unable to parse pageSize param:" + exc.getMessage());
+        }
+        return pageSize;
     }
 
     public static void main(final String[] args) {

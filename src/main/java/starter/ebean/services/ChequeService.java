@@ -1,5 +1,6 @@
 package starter.ebean.services;
 
+import starter.ebean.dtos.ChequeDTO;
 import starter.ebean.dtos.ResponseMessage;
 import starter.ebean.models.Cheque;
 import starter.ebean.models.User;
@@ -16,7 +17,7 @@ public interface ChequeService {
      * @param cheque the Cheque object to be saved
      * @return the db id of the saved Cheque
      */
-    Long addCheque(Cheque cheque);
+    Long addCheque(ChequeDTO cheque);
 
     /** Finds the {@link starter.ebean.models.Cheque} record with the specified db id
      *
@@ -25,11 +26,11 @@ public interface ChequeService {
      */
     Cheque findChequeById(Long id);
 
-    /** Returns a {@link List} of all the {@link starter.ebean.models.Cheque}s in the database
+    /** Returns a {@link List} of the {@link starter.ebean.models.Cheque}s in the database
      *
      * @return List of Cheques
      */
-    List<Cheque> findAll();
+    List<Cheque> findPage(int page, int pageSize);
 
     ResponseMessage assignChequeToUser(Long chequeId, Long userId);
 }
